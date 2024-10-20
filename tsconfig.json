@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "resolveJsonModule": true,                              
+    "outDir": "dist",
+    "esModuleInterop": true,                   
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "moduleResolution": "Node",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "lambda.ts",
+    "app.ts",
+    "connection.ts"]
+}
