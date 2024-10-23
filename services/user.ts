@@ -17,8 +17,3 @@ export async function getUser(id: string): Promise<User> {
         throw new Error("Invalid user ID")
     }
 }
-
-export async function registerUser(user: User){
-    const registeredUser = UserModel.insertMany(user);
-    return registeredUser
-}

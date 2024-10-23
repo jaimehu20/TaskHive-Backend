@@ -20,5 +20,5 @@ export async function login(data: {email: string, password: string}){
     }
     const userData = { email, password };
     const token = jwt.sign(userData, secretToken as string, {expiresIn: "30m"});
-    return { message: "login successful", token };
+    return { message: "login successful", token, id: user._id.toString() };
 }
