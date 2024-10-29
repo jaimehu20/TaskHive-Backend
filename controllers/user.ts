@@ -1,7 +1,18 @@
 import express, { NextFunction, Request, Response } from "express";
-import { getUsers, getUser } from "../services/user";
+import { getUser, getUsers, updatePreferences } from "../services/user";
 
 export const UserController = express.Router();
+
+UserController.patch("/first-steps/:id", async (request: Request, response: Response, next: NextFunction): Promise<any> => {
+    try {
+        const id = request.params.id;
+        const data = request.body;
+        const preferences = await updatePreferences(id, data);
+        return response.json({preferences})
+    } catch (error) {
+        next(error)  
+    }
+})
 
 UserController.get("/users", async (request: Request, response: Response, next: NextFunction) : Promise<any> => {
     try {
