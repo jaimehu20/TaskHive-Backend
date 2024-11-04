@@ -28,8 +28,6 @@ const TaskSchema: Schema = new Schema({
     status: { type: String, default: 'Pending' },
     tags: { type: Array, default: []},
     guests: { type: Array, default: [] }
-}, {
-    _id: false
 })
 
 const UserSchema = new Schema<User>({

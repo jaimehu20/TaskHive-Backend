@@ -19,7 +19,7 @@ UserController.get("/users", async (request: Request, response: Response, next: 
         const allUsers = await getUsers();
         return response.json({allUsers})
     } catch(error) {
-        console.log(error);
+        console.error(error);
         next(error)
     }
 })
@@ -30,7 +30,7 @@ UserController.get("/users/:id", async (request: Request, response: Response, ne
         const user = await getUser(id);
         return response.json({user})
     } catch(error) {
-        console.log(error);
+        console.error(error);
         next(error)
     }
 })

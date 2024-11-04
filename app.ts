@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors"
 import { UserController } from "./controllers/user";
 import { RegisterController } from "./controllers/register"
-// import { TaskController } from "./controllers/task";
+import { TaskController } from "./controllers/task";
 import { LoginController } from "./controllers/login";
 import { verifyAccessToken } from "./middleware/auth";
 
@@ -26,4 +26,4 @@ app.listen(3000, () => {
 app.use("/", LoginController)
 app.use("/", RegisterController)
 app.use("/", verifyAccessToken, UserController); 
-// app.use("/", verifyAccessToken, TaskController)
+app.use("/", verifyAccessToken, TaskController)

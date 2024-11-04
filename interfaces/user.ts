@@ -31,8 +31,8 @@ interface Task {
     deadLine: string,
     priority: string,
     status: string,
-    tags: Tags[],
-    guests: Guest[]
+    tags?: Tags[],
+    guests?: Guest[]
 }
 
 interface Tags {
