@@ -24,6 +24,8 @@ const TaskSchema: Schema = new Schema({
     taskName: {type: String, default: ''},
     taskDescription: { type: String, default: ''},
     deadLine: { type: String, default: ''},
+    startTime: { type: String, default: ''},
+    endTime: { type: String, default: ''},
     priority: { type: String, default: '' },
     status: { type: String, default: 'Pending' },
     tags: { type: Array, default: []},
