@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs')
 
 export const RegisterController = express.Router();
 
-RegisterController.post("/users", async (request: Request, response: Response, next: NextFunction): Promise<any> => {
+RegisterController.post("/users", async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, lastname, birthdate, email, password } = request.body;
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,11 +21,11 @@ RegisterController.post("/users", async (request: Request, response: Response, n
           response.json("User registered succesfully.")
     } catch (error: any) {
         if (error instanceof mongoose.Error.ValidationError) {
-            return response.status(400).json({ message: 'Validation error:' + error.message })
+            response.status(400).json({ message: 'Validation error:' + error.message })
         } else if (error.code === 11000) {
-            return response.status(400).json({ message: 'Email already in use' });
+            response.status(400).json({ message: 'Email already in use' });
         } else {
-            return response.status(500).json({ message: "Error registering user: " + error.message })
+            response.status(500).json({ message: "Error registering user: " + error.message })
         }
     }
 })

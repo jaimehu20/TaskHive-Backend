@@ -1,3 +1,5 @@
+import { Document } from "mongoose"
+
 export interface User {
     name: string,
     lastname: string,
@@ -9,7 +11,9 @@ export interface User {
     tasks?: Task[]
 }
 
-interface Preferences {
+export interface UserDocument extends User, Document {}
+
+export interface Preferences {
     reminder: boolean,
     reminderFrequency: string,
     dateFormat: string,
@@ -25,7 +29,7 @@ interface Profile {
     ocupation: string
 }
 
-interface Task {
+export interface Task {
     taskName: string,
     taskDescription: string,
     deadLine: string,
@@ -45,3 +49,7 @@ interface Guest {
     name: string,
     profilePic: string
 }
+
+export type UpdatePreferencesResponse = {
+    preferences: Preferences;
+};

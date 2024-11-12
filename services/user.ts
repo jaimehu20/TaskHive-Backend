@@ -1,4 +1,4 @@
-import { User } from "../interfaces/user";
+import { Preferences, Task, User, UserDocument } from "../interfaces/user";
 import { UserModel } from "../models/user";
 
 export async function getUsers(): Promise<User[]> {
@@ -18,7 +18,7 @@ export async function getUser(id: string): Promise<User> {
     }
 } 
 
-export async function updatePreferences(id: any, preferences: any): Promise<any> {
+export async function updatePreferences(id: string, preferences: Preferences): Promise<User | null> {
     try {
         const data = UserModel.findByIdAndUpdate(id, { preferences }, {new: true});
         return data
@@ -27,7 +27,7 @@ export async function updatePreferences(id: any, preferences: any): Promise<any>
     }
 }
 
-export async function addTask(id: any, tasks: any): Promise<any> {
+export async function addTask(id: string, tasks: Task): Promise<UserDocument | null> {
     try {
         const data = UserModel.findByIdAndUpdate(id, { $push: { tasks } }, {new: true});
         return data
@@ -36,7 +36,7 @@ export async function addTask(id: any, tasks: any): Promise<any> {
     }
 }
 
-export async function editTask(id: any, taskId: any, updatedTask: any): Promise<any> {
+export async function editTask(id: string, taskId: string, updatedTask: Task): Promise<UserDocument | null> {
     try {
         const data = UserModel.findOneAndUpdate({_id: id, "tasks._id": taskId}, { $set: { "tasks.$": updatedTask } }, {new: true});
         return data
@@ -45,7 +45,7 @@ export async function editTask(id: any, taskId: any, updatedTask: any): Promise<
     }
 }
 
-export async function deleteTask(id: any, taskId: any): Promise<any> {
+export async function deleteTask(id: string, taskId: string): Promise<UserDocument | null> {
     try {
         const data = UserModel.findByIdAndUpdate(id, { $pull: { tasks: { _id: taskId } } }, {new: true})
         return data
