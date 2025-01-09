@@ -1,9 +1,12 @@
 import express, { NextFunction, Request, Response } from "express";
-import { getProfilePic, getUser, getUsers, updatePreferences, updateProfilePic } from "../services/user";
+import { getUser, getUsers, updatePreferences, updateProfilePic } from "../services/user";
 import { Preferences } from "../interfaces/user";
-import { upload } from "../config/multerConfig"
+import multer from "multer";
 
 export const UserController = express.Router();
+
+const storage = multer.diskStorage({});
+const upload = multer({ storage })
 
 UserController.patch("/first-steps/:id", async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
@@ -37,29 +40,19 @@ UserController.get("/users/:id", async (request: Request, response: Response, ne
     }
 })
 
-UserController.post('/upload-profile-image/:id', upload.single('profileImage'), async (request: Request, response: Response, next: NextFunction) => {
-    const userID = request.params.id;
-    const file = request.file;
-
+UserController.post("/upload-profile-image/:id", upload.single("profileImage"), async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-        if (userID && file) {
-            const avatarID = await updateProfilePic(userID, file)
-            response.json({avatarID})
+        const id = request.params.id;
+        const file = request.file;
+
+        if (!file) {
+            response.status(400).json({ message: "No file uploaded" })
         }
-    } catch(error) {
-        console.error(error);
-        next(error)
-    }
-})
 
-UserController.get('/profile-image/:avatarID', async (request: Request, response: Response, next: NextFunction): Promise<any> => {
-    const avatarID = request.params.avatarID;
-
-    try {
-        const imageBuffer = await getProfilePic(avatarID);
-        response.contentType('image/png');
-        response.send(imageBuffer)
+        const updatedUser = await updateProfilePic(id, file as Express.Multer.File);
+        response.json({ message: "Profile picture updated successfully", avatar: updatedUser?.profile?.avatar })
     } catch (error) {
+        console.error(error);
         next(error)
     }
 })

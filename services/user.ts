@@ -1,8 +1,6 @@
 import { Preferences, Task, User, UserDocument } from "../interfaces/user";
 import { UserModel } from "../models/user";
-import { gfs } from "../config/gridFSConfig";
-import { GridFSBucketWriteStream } from "mongodb"
-import mongoose from "mongoose";
+import cloudinary from "../cloudinaryConfig"
 
 export async function getUsers(): Promise<User[]> {
     const users = UserModel.find();
@@ -57,57 +55,29 @@ export async function updatePreferences(id: string, preferences: Preferences): P
     }
 }
 
-export async function updateProfilePic(userID: string, file: Express.Multer.File ) {
+export async function updateProfilePic(id: string, file: Express.Multer.File): Promise<UserDocument | null> {
     if (!file) {
         throw new Error('No file uploaded');
     }
 
-    const buffer = file.buffer;
-
-    const fileDocument = {
-        filename: file.originalname,
-        contentType: file.mimetype,
-        metadata: {userID},
-        bucketName: 'profileImages'
-    };
-
-    if (gfs) {
-        const uploadStream: GridFSBucketWriteStream = gfs.openUploadStream(file.originalname, fileDocument);
-        uploadStream.on('finish', async () => {
-            try {
-                const fileID = uploadStream.id;
-                const updatedUser = await UserModel.findByIdAndUpdate(userID, { $set: { 'profile.avatar': fileID } }, { new: true });
-                return updatedUser;
-            } catch (error: any) {
-                throw new Error(`Error updating pic: ${error.message}`)
-            }
-        });
-
-        uploadStream.end(file.buffer);
-    }
-}
-
-export async function getProfilePic(avatarID: string) {
     try {
-        return new Promise<Buffer>((resolve, reject) => {
-            const objectId = new mongoose.Types.ObjectId(avatarID);
-            const downloadStream = gfs?.openDownloadStream(objectId);
-            let chunks: Buffer[] = [];
-
-            downloadStream?.on('data', (chunk) => {
-                chunks.push(chunk);
-            });
-
-            downloadStream?.on('end', () => {
-                const imageBuffer = Buffer.concat(chunks);
-                resolve(imageBuffer);
-            });
-
-            downloadStream?.on('error', (err) => {
-                reject(new Error(`Error retrieving the image: ${err.message}`))
-            });
+        const result = await cloudinary.uploader.upload(file.path, {
+            folder: "profileImages",
+            resource_type: "image"
         });
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            id,
+            {$set: { "profile.avatar": result.secure_url } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            throw new Error('User not found');
+        }
+
+        return updatedUser;
     } catch (error: any) {
-        throw new Error(`Error retrieving profile picture: ${error.message}`)
+            throw new Error(`Error uploading profile picture: ${error.message}`)
     }
 }
