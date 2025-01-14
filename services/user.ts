@@ -60,6 +60,10 @@ export async function updateProfilePic(id: string, file: Express.Multer.File): P
         throw new Error('No file uploaded');
     }
 
+    if (!file.mimetype.startsWith("image/")) {
+        throw new Error("Invalid image file type");
+    }
+
     try {
         const result = await cloudinary.uploader.upload(file.path, {
             folder: "profileImages",
@@ -68,7 +72,7 @@ export async function updateProfilePic(id: string, file: Express.Multer.File): P
 
         const updatedUser = await UserModel.findByIdAndUpdate(
             id,
-            {$set: { "profile.avatar": result.secure_url } },
+            { $set: { "profile.avatar": result.secure_url } },
             { new: true }
         );
 
@@ -78,6 +82,31 @@ export async function updateProfilePic(id: string, file: Express.Multer.File): P
 
         return updatedUser;
     } catch (error: any) {
-            throw new Error(`Error uploading profile picture: ${error.message}`)
+        throw new Error(`Error uploading profile picture: ${error.message}`);
+    }
+}
+
+export async function getTasksByDate(id: string, date: Date): Promise<Task[] | any> {
+    try {
+
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+
+        const user = await UserModel.findById(id).select('tasks');
+        if (!user || !user.tasks) {
+            throw new Error('User not found or has no tasks')
+        }
+
+        const tasksOnDate = user.tasks.filter(task => {
+            const taskDate = new Date(task.deadLine);
+            return taskDate >= startOfDay && taskDate <= endOfDay;
+        });
+
+        return tasksOnDate;
+    } catch (error: any) {
+        throw new Error(`Error while getting tasks: ${error.message}`)
     }
 }

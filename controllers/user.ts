@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-import { getUser, getUsers, updatePreferences, updateProfilePic } from "../services/user";
+import { getTasksByDate, getUser, getUsers, updatePreferences, updateProfilePic } from "../services/user";
 import { Preferences } from "../interfaces/user";
 import multer from "multer";
 
@@ -31,7 +31,7 @@ UserController.get("/users", async (request: Request, response: Response, next: 
 
 UserController.get("/users/:id", async (request: Request, response: Response, next: NextFunction) : Promise<void> => {
     try {
-        const id = request.params.id;
+        const id: string = request.params.id;
         const user = await getUser(id);
         response.json({user})
     } catch(error) {
@@ -42,7 +42,7 @@ UserController.get("/users/:id", async (request: Request, response: Response, ne
 
 UserController.post("/upload-profile-image/:id", upload.single("profileImage"), async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-        const id = request.params.id;
+        const id: string = request.params.id;
         const file = request.file;
 
         if (!file) {
@@ -56,3 +56,25 @@ UserController.post("/upload-profile-image/:id", upload.single("profileImage"), 
         next(error)
     }
 })
+
+UserController.get("/users/:id/tasks", async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id: string = request.params.id;
+        const { date } = request.query;
+
+        if (!date || typeof date !== 'string') {
+            response.status(400).json({ error: 'La fecha es obligatoria y debe ser un string válido' });
+        }
+
+        const parsedDate = new Date(date as string);
+        if (isNaN(parsedDate.getTime())) {
+            response.status(400).json({ error: 'La fecha proporcionada no es válida' });
+        }
+
+        const tasks = await getTasksByDate(id, parsedDate);
+        response.json({ tasks });
+    } catch (error: any) {
+        console.error(error);
+        next(error);
+    }
+});
